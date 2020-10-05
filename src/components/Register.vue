@@ -11,7 +11,7 @@
         <label for="password">パスワード</label>
         <input id="password" type="password" v-model="password">
         <br><br>
-        <button @click="register">新規登録</button>
+        <button @click="onClickRegisterBtn">新規登録</button>
         <br>
         <a>ログインはこちらから</a>
     </div>
@@ -20,8 +20,6 @@
 </template>
 
 <script>
-import firebase from '@/firebase/firestore'
-
 export default {
     data() {
         return {
@@ -31,24 +29,15 @@ export default {
         }
     },
     methods: {
-        register: function () {
-            firebase.auth().createUserWithEmailAndPassword(this.email, this.password).then((result) => {
-                    result.user.updateProfile({
-                        displayName: this.name
-                    }).then(() => {
-                        alert('アカウントの新規作成が完了しました！')
-                    })
-                },
-                (error) => {
-                    if (error.toString() === 'Error: The email address is badly formatted.') {
-                        alert('適切なメールアドレスの形ではありません');
-                    }
-                    if (error.toString() === 'Error: The email address is already in use by another account.') {
-                        alert('既に登録済みのメールアドレスです');
-                    }
+        onClickRegisterBtn() {
+            this.$store.dispatch('actionRegisterUserInfo', {
+                userInfo: {
+                    email: this.email,
+                    password: this.password,
+                    name: this.name
                 }
-            )
-        }
+            })
+        },
     }
 }
 </script>
