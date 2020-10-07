@@ -1,0 +1,39 @@
+<template>
+  <div>
+    <h2>ログイン</h2>
+    <label for="email">Email：</label>
+    <input id="email" type="email" v-model="email">
+    <br><br>
+    <label for="password">パスワード：</label>
+    <input id="password" type="password" v-model="password">
+    <br><br>
+    <button @click="login">送信</button>
+  </div>
+</template>
+
+<script>
+export default{
+  data(){
+    return{
+      email:'',
+      password:'',
+    }
+  },
+  methods: {
+    login(){
+      
+    }
+  }
+}
+</script>
+
+<style>
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
+</style>
