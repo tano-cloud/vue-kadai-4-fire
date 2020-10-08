@@ -16,7 +16,7 @@ export default new Vuex.Store({
         password:payload.userInfo.password,
         name:payload.userInfo.name
       })
-    }
+    },
   },
   actions: {
     actionRegisterUserInfo(context, payload){
@@ -33,11 +33,35 @@ export default new Vuex.Store({
         if (error.toString() === 'Error: The email address is badly formatted.') {
             alert('適切なメールアドレスの形ではありません');
         }
-        if (error.toString() === 'Error: The email address is already in use by another account.') {
+        else if(error.toString() === 'Error: The email address is already in use by another account.') {
             alert('既に登録済みのメールアドレスです');
+        }
+        else{
+          alert('エラーです');
         }
       }
       )
+    },
+    actionLoginUserInfo(context, payload){
+      //payload=(email,password)
+      firebase.auth().signInWithEmailAndPassword(payload.userInfo.email, payload.userInfo.password).then(() => {
+        alert('ログインできました')
+    },
+    (error)=>{
+      if (error.code === 'auth/invalid-email') {
+        alert('適切なメールアドレスの形ではありません');
+      }
+      else if(error.code === 'auth/wrong-password') {
+        alert('パスワードが誤っているか、入力されていません');
+      }
+      else if(error.code === 'auth/user-not-found') {
+        alert('登録されていないユーザーです');
+      }
+      else{
+        alert('エラーです');
+      }
+    }
+    )
     }
   },
 })
