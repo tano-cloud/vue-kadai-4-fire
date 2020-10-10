@@ -7,26 +7,25 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   strict:true,
   state: {
-    userInfo:[]
+    userInfo:{email:null, name:null},
   },
   mutations: {
-    mutationsRegisterUserInfo(state, payload){
-      state.userInfo.push({
-        email:payload.userInfo.email,
-        password:payload.userInfo.password,
-        name:payload.userInfo.name
-      })
+    mutationsRegisterUserInfo(state, doc){
+      //doc = ログインしたユーザのdocument(firestoreのcollectionに格納)
+      state.userInfo.email = doc.data().email
+      state.userInfo.name = doc.data().name
     },
   },
   actions: {
     actionRegisterUserInfo(context, payload){
-      //payload=(email,password,name)
-      firebase.auth().createUserWithEmailAndPassword(payload.userInfo.email, payload.userInfo.password).then((result) => {
-        result.user.updateProfile({
-            displayName: payload.userInfo.name
+      //payload = (email, password, name)
+      firebase.auth().createUserWithEmailAndPassword(payload.userInfo.email, payload.userInfo.password).then(() => {
+        firebase.firestore().collection('users').add({
+          email:payload.userInfo.email,
+          password:payload.userInfo.password,
+          name:payload.userInfo.name
         }).then(() => {
-            alert('アカウントの新規作成が完了しました！')
-            context.commit('mutationsRegisterUserInfo', payload)
+            context.dispatch('actionMatchUser', payload)
         })
     },
     (error) => {
@@ -37,16 +36,16 @@ export default new Vuex.Store({
             alert('既に登録済みのメールアドレスです');
         }
         else{
-          alert('エラーです');
+          console.log('エラーです');
         }
       }
       )
     },
     actionLoginUserInfo(context, payload){
-      //payload=(email,password)
+      //payload = (email,password)
       firebase.auth().signInWithEmailAndPassword(payload.userInfo.email, payload.userInfo.password).then(() => {
-        alert('ログインできました')
-    },
+            context.dispatch('actionMatchUser', payload)
+      },
     (error)=>{
       if (error.code === 'auth/invalid-email') {
         alert('適切なメールアドレスの形ではありません');
@@ -58,10 +57,22 @@ export default new Vuex.Store({
         alert('登録されていないユーザーです');
       }
       else{
-        alert('エラーです');
+        console.log('エラーです');
       }
     }
-    )
-    }
+    )}
+    ,
+    actionMatchUser(context, payload){
+      //payload = (email,password)
+      firebase.firestore().collection('users').where('email', '==', payload.userInfo.email)
+      .get().then((querySnapshot) => {
+         querySnapshot.forEach( (doc) => {
+           context.commit('mutationsRegisterUserInfo', doc)
+         });
+      })
+      .catch( (error) => {
+         console.log(error);
+      });
+    },
   },
 })

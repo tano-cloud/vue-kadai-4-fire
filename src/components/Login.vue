@@ -10,9 +10,7 @@
         <br><br>
         <button @click="onClickLoginBtn">ログイン</button>
         <br>
-        <a>
-            <router-link to="/">新規登録はこちらから</router-link>
-        </a>
+        <router-link to="/">新規登録はこちらから</router-link>
         <router-view />
     </div>
     <footer>Copyright ©2019 ○○ Inc All rights reserved</footer>
@@ -45,8 +43,8 @@ export default {
     background-color: white;
     color: #84BDEC;
     border: 1px #84BDEC solid;
-    padding: 10px;
     cursor: pointer;
+    padding: 10px;
 }
 
 #login-column a {

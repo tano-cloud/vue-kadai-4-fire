@@ -13,9 +13,7 @@
         <br><br>
         <button @click="onClickRegisterBtn">新規登録</button>
         <br>
-        <a>
-            <router-link to="/Login">ログインはこちらから</router-link>
-        </a>
+        <router-link to="/Login">ログインはこちらから</router-link>
         <router-view />
     </div>
     <footer>Copyright ©2019 ○○ Inc All rights reserved</footer>
@@ -50,6 +48,7 @@ export default {
     background-color: white;
     color: #84BDEC;
     border: 1px #84BDEC solid;
+    cursor: pointer;
     padding: 10px;
 }
 
