@@ -31,11 +31,12 @@ export default {
     },
     methods: {
         onClickRegisterBtn() {
-            this.$store.dispatch('actionRegisterUserInfo', {
+            this.$store.dispatch('registerUserInfo', {
                 userInfo: {
                     email: this.email,
                     password: this.password,
-                    name: this.name
+                    name: this.name,
+                    wallet: 0,
                 }
             })
         },

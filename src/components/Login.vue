@@ -27,7 +27,7 @@ export default {
     },
     methods: {
         onClickLoginBtn() {
-            this.$store.dispatch('actionLoginUserInfo', {
+            this.$store.dispatch('loginUserInfo', {
                 userInfo: {
                     email: this.email,
                     password: this.password,
