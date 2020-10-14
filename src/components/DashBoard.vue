@@ -4,7 +4,7 @@
         <p>{{getUserName}}さんようこそ！！</p>
         <div class="header-right-column">
             <p>残高：{{getUserWallet}}</p>
-            <button @click="logoutBtn">ログアウト</button>
+            <button>ログアウト</button>
         </div>
     </header>
     <br>
@@ -20,12 +20,7 @@ import {
     mapGetters
 } from 'vuex'
 export default {
-    computed: mapGetters(['getUserName', 'getUserWallet']),
-    methods: {
-        logoutBtn() {
-            this.$store.dispatch('logout')
-        }
-    },
+    computed: mapGetters(['getUserName', 'getUserWallet'])
 }
 </script>
 

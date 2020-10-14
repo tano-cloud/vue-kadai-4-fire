@@ -73,16 +73,6 @@ export default new Vuex.Store({
     }
     )}
     ,
-    logout(){
-      firebase.auth().signOut().then(()=>{
-        console.log("ログアウトしました");
-        router.push('/login');
-      })
-      .catch( (error)=>{
-        console.log(error);
-      });
-    }
-    ,
     matchUser(context, payload){
       //payload = (email,password)
       firebase.firestore().collection('users').where('email', '==', payload.userInfo.email)
