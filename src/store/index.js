@@ -52,7 +52,7 @@ export default new Vuex.Store({
       }
       )
     },
-    loginUserInfo(context, payload){
+    login(context, payload){
       //payload = (email,password)
       firebase.auth().signInWithEmailAndPassword(payload.userInfo.email, payload.userInfo.password).then(() => {
             context.dispatch('matchUser', payload)
