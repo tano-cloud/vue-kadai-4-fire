@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import router from '../router'
 import firebase from '@/firebase/firestore'
 
 Vue.use(Vuex)
@@ -7,25 +8,35 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   strict:true,
   state: {
-    userInfo:{email:null, name:null},
+    userInfo:{email:null, name:null, wallet:null},
+  },
+  getters: {
+    getUserName(state){
+      return state.userInfo.name;
+    },
+    getUserWallet(state){
+      return state.userInfo.wallet;
+    },
   },
   mutations: {
-    mutationsRegisterUserInfo(state, doc){
+    setUserInfo(state, doc){
       //doc = ログインしたユーザのdocument(firestoreのcollectionに格納)
       state.userInfo.email = doc.data().email
       state.userInfo.name = doc.data().name
+      state.userInfo.wallet = doc.data().wallet
     },
   },
   actions: {
-    actionRegisterUserInfo(context, payload){
+    registerUserInfo(context, payload){
       //payload = (email, password, name)
       firebase.auth().createUserWithEmailAndPassword(payload.userInfo.email, payload.userInfo.password).then(() => {
         firebase.firestore().collection('users').add({
           email:payload.userInfo.email,
           password:payload.userInfo.password,
-          name:payload.userInfo.name
+          name:payload.userInfo.name,
+          wallet:payload.userInfo.wallet,
         }).then(() => {
-            context.dispatch('actionMatchUser', payload)
+            context.dispatch('matchUser', payload)
         })
     },
     (error) => {
@@ -41,10 +52,10 @@ export default new Vuex.Store({
       }
       )
     },
-    actionLoginUserInfo(context, payload){
+    login(context, payload){
       //payload = (email,password)
       firebase.auth().signInWithEmailAndPassword(payload.userInfo.email, payload.userInfo.password).then(() => {
-            context.dispatch('actionMatchUser', payload)
+            context.dispatch('matchUser', payload)
       },
     (error)=>{
       if (error.code === 'auth/invalid-email') {
@@ -62,13 +73,15 @@ export default new Vuex.Store({
     }
     )}
     ,
-    actionMatchUser(context, payload){
+    matchUser(context, payload){
       //payload = (email,password)
       firebase.firestore().collection('users').where('email', '==', payload.userInfo.email)
       .get().then((querySnapshot) => {
          querySnapshot.forEach( (doc) => {
-           context.commit('mutationsRegisterUserInfo', doc)
+           context.commit('setUserInfo', doc)
          });
+      }).then(()=>{
+        router.push('/dashBoard')
       })
       .catch( (error) => {
          console.log(error);
