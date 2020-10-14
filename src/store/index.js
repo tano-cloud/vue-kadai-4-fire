@@ -28,7 +28,7 @@ export default new Vuex.Store({
   },
   actions: {
     registerUserInfo(context, payload){
-      //payload=(email, password, name)
+      //payload = (email, password, name)
       firebase.auth().createUserWithEmailAndPassword(payload.userInfo.email, payload.userInfo.password).then(() => {
         firebase.firestore().collection('users').add({
           email:payload.userInfo.email,
