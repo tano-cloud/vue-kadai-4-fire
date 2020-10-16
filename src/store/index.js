@@ -96,5 +96,14 @@ export default new Vuex.Store({
          console.log(error);
       });
     },
+    redirectToLogin(context, next){
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (!user) {
+          next('/login');
+        } else {
+          next();
+        }
+      });
+    }
   },
 })
