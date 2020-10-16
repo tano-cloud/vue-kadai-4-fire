@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import store from '../store'
 import VueRouter from 'vue-router'
 import Register from '../components/Register.vue'
 
@@ -25,6 +26,9 @@ const routes = [
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../components/DashBoard.vue'),
+    beforeEnter(to, from, next){
+      store.dispatch('redirectToLogin', next)
+    }
   }
 ]
 

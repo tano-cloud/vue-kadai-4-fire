@@ -55,8 +55,8 @@ export default new Vuex.Store({
     login(context, payload){
       //payload = (email,password)
       firebase.auth().signInWithEmailAndPassword(payload.userInfo.email, payload.userInfo.password).then(() => {
-            context.dispatch('matchUser', payload)
-      },
+        context.dispatch('matchUser', payload)
+  },
     (error)=>{
       if (error.code === 'auth/invalid-email') {
         alert('適切なメールアドレスの形ではありません');
@@ -73,6 +73,15 @@ export default new Vuex.Store({
     }
     )}
     ,
+    logout(){
+      firebase.auth().signOut().then(()=>{
+        router.push('/login');
+      })
+      .catch( (error)=>{
+        console.log(error);
+      });
+    }
+    ,
     matchUser(context, payload){
       //payload = (email,password)
       firebase.firestore().collection('users').where('email', '==', payload.userInfo.email)
@@ -87,5 +96,14 @@ export default new Vuex.Store({
          console.log(error);
       });
     },
+    redirectToLogin(context, next){
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (!user) {
+          next('/login');
+        } else {
+          next();
+        }
+      });
+    }
   },
 })
