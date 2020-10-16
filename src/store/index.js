@@ -35,15 +35,15 @@ export default new Vuex.Store({
   },
   actions: {
     registerUserInfo(context, payload){
-      //payload=(email,password,name)
+      //payload=(email, password, name)
       firebase.auth().createUserWithEmailAndPassword(payload.userInfo.email, payload.userInfo.password).then(() => {
-        firebase.firestore().collection("users").add({
+        firebase.firestore().collection('users').add({
           email:payload.userInfo.email,
           password:payload.userInfo.password,
           name:payload.userInfo.name,
-          wallet:payload.userInfo.wallet
+          wallet:payload.userInfo.wallet,
         }).then(() => {
-            context.dispatch('matchUser',payload)
+            context.dispatch('matchUser', payload)
         })
     },
     (error) => {
@@ -85,7 +85,7 @@ export default new Vuex.Store({
         router.push('/login');
       })
       .catch( (error)=>{
-        console.log(`ログアウト時にエラーが発生しました (${error})`);
+        console.log(error);
       });
     }
     ,
@@ -105,7 +105,7 @@ export default new Vuex.Store({
     },
     getAllUser(context){
       const allUserContainer = [];
-      firebase.firestore().collection("users").get().then((querySnapshot)=>{
+      firebase.firestore().collection('users').get().then((querySnapshot)=>{
         querySnapshot.forEach( (doc) => {
           allUserContainer.push(doc.data())
       })}).then(()=>{
