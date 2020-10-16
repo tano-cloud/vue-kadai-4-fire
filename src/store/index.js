@@ -9,6 +9,7 @@ export default new Vuex.Store({
   strict:true,
   state: {
     userInfo:{email:null, name:null, wallet:null},
+    allUser:null,
   },
   getters: {
     getUserName(state){
@@ -16,6 +17,9 @@ export default new Vuex.Store({
     },
     getUserWallet(state){
       return state.userInfo.wallet;
+    },
+    getAllUser(state){
+      return state.allUser;
     },
   },
   mutations: {
@@ -25,18 +29,21 @@ export default new Vuex.Store({
       state.userInfo.name = doc.data().name
       state.userInfo.wallet = doc.data().wallet
     },
+    setAllUser(state, allUserContainer){
+      state.allUser = allUserContainer
+    }
   },
   actions: {
     registerUserInfo(context, payload){
-      //payload = (email, password, name)
+      //payload=(email,password,name)
       firebase.auth().createUserWithEmailAndPassword(payload.userInfo.email, payload.userInfo.password).then(() => {
-        firebase.firestore().collection('users').add({
+        firebase.firestore().collection("users").add({
           email:payload.userInfo.email,
           password:payload.userInfo.password,
           name:payload.userInfo.name,
-          wallet:payload.userInfo.wallet,
+          wallet:payload.userInfo.wallet
         }).then(() => {
-            context.dispatch('matchUser', payload)
+            context.dispatch('matchUser',payload)
         })
     },
     (error) => {
@@ -78,7 +85,7 @@ export default new Vuex.Store({
         router.push('/login');
       })
       .catch( (error)=>{
-        console.log(error);
+        console.log(`ログアウト時にエラーが発生しました (${error})`);
       });
     }
     ,
@@ -95,6 +102,15 @@ export default new Vuex.Store({
       .catch( (error) => {
          console.log(error);
       });
+    },
+    getAllUser(context){
+      const allUserContainer = [];
+      firebase.firestore().collection("users").get().then((querySnapshot)=>{
+        querySnapshot.forEach( (doc) => {
+          allUserContainer.push(doc.data())
+      })}).then(()=>{
+        context.commit('setAllUser', allUserContainer);
+      })
     },
     redirectToLogin(context, next){
       firebase.auth().onAuthStateChanged(function(user) {
