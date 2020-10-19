@@ -1,20 +1,31 @@
 <template>
 <div id="dashBoard">
 
-    <div id="overlay" v-show="showContent">
-        <div id="content">
-            <p>{{userName}}さんの残高</p>
-            <p>{{userWallet}}</p>
+    <div class="overlay" v-show="this.$store.getters.showContentWallet" @click.self="closeModal">
+        <div class="content">
+            <p>{{otherName}}さんの残高</p>
+            <p>{{otherWallet}}</p>
             <div>
                 <button v-on:click="closeModal">Close</button>
             </div>
         </div>
     </div>
 
+    <div class="overlay" v-show="this.$store.getters.showContentSubmit" @click.self="closeSubmitModal">
+        <div class="content">
+            <p>あなたの残高：{{latestMyWallet}}</p>
+            <p>送る金額</p>
+            <input @input="validate" v-model=" inputAmount">
+            <div>
+                <button v-on:click="submitMoneyBtn">送信</button>
+            </div>
+        </div>
+    </div>
+
     <header>
-        <p>{{getUserName}}さんようこそ！！</p>
+        <p>{{myName}}さんようこそ！！</p>
         <div class="header-right-column">
-            <p>残高：{{getUserWallet}}</p>
+            <p>残高：{{myWallet}}</p>
             <button @click="logoutBtn">ログアウト</button>
         </div>
     </header>
@@ -24,12 +35,12 @@
         <ul>
             <li id="dashBoard-column-username">ユーザ名</li>
             <li>
-                <ul v-for="(getuser, index) in getAllUser" v-bind:key="index">
-                    <li>{{getuser.name}}</li>
+                <ul v-for="(allUser, index) in allUser" v-bind:key="index">
+                    <li>{{allUser.name}}</li>
                     <li id="dashBoard-column-money">
                         <div>
-                            <button v-on:click="openModal(getuser.wallet, getuser.name)">walletを見る</button>
-                            <button>送る</button>
+                            <button v-on:click="openModalWallet(allUser.docId, allUser.name)">walletを見る</button>
+                            <button v-on:click="openModalSubmit(allUser.docId, allUser.wallet, allUser.email)">送る</button>
                         </div>
                     </li>
                 </ul>
@@ -47,28 +58,60 @@ import {
 export default {
     data() {
         return {
-            showContent: false,
-            userWallet: null,
-            userName: null,
+            otherName: null,
+            otherDocId: null,
+            otherEmail: null,
+            inputAmount: '',
         }
     },
-    computed: mapGetters(['getUserName', 'getUserWallet', 'getAllUser']),
+    computed: mapGetters(['myName', 'myWallet', 'allUser', 'otherWallet', 'myDocId', 'latestMyWallet', 'showContentWallet', 'showContentSubmit']),
     methods: {
         logoutBtn() {
             this.$store.dispatch('logout')
         },
-        openModal: function (userWallet, userName) {
-            this.showContent = true
-            this.userWallet = userWallet
-            this.userName = userName
+        submitMoneyBtn: function () {
+            const updateOtherWallet = Number(this.inputAmount) + Number(this.$store.getters.otherWallet)
+            const updateMyWallet = Number(this.$store.getters.latestMyWallet) - Number(this.inputAmount)
+            this.inputAmount = ''
+            this.$store.commit('setCloseContentSubmit')
+            this.$store.dispatch('submitMoney', {
+                userInfo: {
+                    email: this.otherEmail,
+                    updateOtherWallet: updateOtherWallet,
+                    updateMyWallet: updateMyWallet,
+                    inputAmount: this.inputAmount,
+                    docId: this.otherDocId,
+                }
+            })
+        },
+        openModalWallet: function (userDocId, userName) {
+            this.otherName = userName
+            this.$store.dispatch('otherWallet', userDocId)
+            this.$store.dispatch('contentWallet')
+        },
+        openModalSubmit: function (userDocId, userWallet, userEmail) {
+            this.otherDocId = userDocId
+            this.otherEmail = userEmail
+            this.$store.dispatch('latestMyWallet', this.$store.getters.myDocId)
+            this.$store.dispatch('otherWallet', userDocId)
+            this.$store.dispatch('contentSubmit')
         },
         closeModal: function () {
-            this.showContent = false
+            this.$store.commit('setCloseContentWallet')
+        },
+        closeSubmitModal: function () {
+            this.$store.commit('setCloseContentSubmit')
+        },
+        validate() {
+            this.inputAmount = this.inputAmount.replace(/\D/g, '')
+            const rep = new RegExp("^0+0?");
+            this.inputAmount = this.inputAmount.replace(rep, "")
         }
     },
     beforeMount: function () {
         this.$store.dispatch('getAllUser')
-    }
+        this.$store.dispatch('getLocalStorage')
+    },
 }
 </script>
 
@@ -146,7 +189,7 @@ export default {
     margin-top: 100px;
 }
 
-#overlay {
+.overlay {
     z-index: 1;
     position: fixed;
     top: 0;
@@ -159,19 +202,19 @@ export default {
     justify-content: center;
 }
 
-#content {
+.content {
     z-index: 2;
     width: 17%;
     padding: 0px;
     background: #fff;
 }
 
-#content div {
+.content div {
     padding: 10px;
     background: #C9CAC9;
 }
 
-#content div button {
+.content div button {
     color: white;
     border: none;
     padding: 8px;
