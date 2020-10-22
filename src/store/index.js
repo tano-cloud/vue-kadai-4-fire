@@ -13,7 +13,7 @@ export default new Vuex.Store({
     latestMyWallet: 0,
     showContentWallet: false,
     showContentSubmit: false,
-    allUser:null,
+    allUser: null,
   },
   getters: {
     myName(state){
@@ -44,34 +44,34 @@ export default new Vuex.Store({
   mutations: {
     setUserInfo(state, doc){
       //doc = ログインしたユーザのdocument(firestoreのcollectionに格納)
-      state.userInfo.email = doc.email
-      state.userInfo.name = doc.name
-      state.userInfo.wallet = doc.wallet
-      state.userInfo.docId = doc.docId
+      state.userInfo.email = doc.email;
+      state.userInfo.name = doc.name;
+      state.userInfo.wallet = doc.wallet;
+      state.userInfo.docId = doc.docId;
     },
     setMyWallet(state, updateMyWallet){
-      state.userInfo.wallet = updateMyWallet
+      state.userInfo.wallet = updateMyWallet;
     },
     setOtherWallet(state, otherWallet){
-      state.otherWallet = otherWallet
+      state.otherWallet = otherWallet;
     },
     setLatestmyWallet(state, myWallet){
-      state.latestMyWallet = myWallet
+      state.latestMyWallet = myWallet;
     },
     setAllUser(state, allUserContainer){
-      state.allUser = allUserContainer
+      state.allUser = allUserContainer;
     },
     setContentWallet(state){
-      state.showContentWallet = true
+      state.showContentWallet = true;
     },
     setCloseContentWallet(state){
-      state.showContentWallet = false
+      state.showContentWallet = false;
     },
     setContentSubmit(state){
-      state.showContentSubmit = true
+      state.showContentSubmit = true;
     },
     setCloseContentSubmit(state){
-      state.showContentSubmit = false
+      state.showContentSubmit = false;
     },
   },
   actions: {
@@ -85,7 +85,7 @@ export default new Vuex.Store({
           wallet:payload.userInfo.wallet,
         }).then((doc) => {
           firebase.firestore().collection('users').doc(doc.id).update({
-            docId:doc.id,
+            docId:doc.id
           })
         }).then(() => {
           context.dispatch('matchUser', payload)
@@ -107,7 +107,7 @@ export default new Vuex.Store({
     login(context, payload){
       //payload = (email,password)
       firebase.auth().signInWithEmailAndPassword(payload.userInfo.email, payload.userInfo.password).then(() => {
-        context.dispatch('matchUser', payload)
+        context.dispatch('matchUser', payload);
       },
     (error)=>{
       if (error.code === 'auth/invalid-email') {
@@ -139,11 +139,11 @@ export default new Vuex.Store({
       firebase.firestore().collection('users').where('email', '==', payload.userInfo.email)
       .get().then((querySnapshot) => {
          querySnapshot.forEach( (doc) => {
-           context.commit('setUserInfo', doc.data())
-           localStorage.setItem('loginUser', JSON.stringify(doc.data()))
+           context.commit('setUserInfo', doc.data());
+           localStorage.setItem('loginUser', JSON.stringify(doc.data()));
           });
       }).then(()=>{
-        router.push('/dashBoard')
+        router.push('/dashBoard');
       })
       .catch( (error) => {
          console.log(error);
@@ -154,7 +154,7 @@ export default new Vuex.Store({
       firebase.firestore().collection('users').get().then((querySnapshot)=>{
         querySnapshot.forEach( (doc) => {
           if(!(this.getters.myDocId == doc.data().docId)){
-          allUserContainer.push(doc.data())
+          allUserContainer.push(doc.data());
           }
       })}).then(()=>{
         context.commit('setAllUser', allUserContainer);
@@ -169,13 +169,13 @@ export default new Vuex.Store({
       });
     },
     otherWallet(context, otherDocId){
-      firebase.firestore().collection('users').doc(otherDocId).get().then(function(doc){
-        context.commit('setOtherWallet' ,doc.data().wallet)
+      firebase.firestore().collection('users').doc(otherDocId).get().then((doc)=>{
+        context.commit('setOtherWallet', doc.data().wallet);
       })
     },
     latestMyWallet(context, myDocId){
-      firebase.firestore().collection('users').doc(myDocId).get().then(function(doc){
-        context.commit('setLatestmyWallet' ,doc.data().wallet)
+      firebase.firestore().collection('users').doc(myDocId).get().then((doc)=>{
+        context.commit('setLatestmyWallet', doc.data().wallet);
       })
     },
     submitMoney(context, payload){
@@ -190,25 +190,25 @@ export default new Vuex.Store({
     .then(()=>{
       firebase.firestore().collection('users').doc(this.getters.myDocId)
       .get().then((doc) => {
-        localStorage.setItem('loginUser', JSON.stringify(doc.data()))
+        localStorage.setItem('loginUser', JSON.stringify(doc.data()));
       })
-      context.commit('setMyWallet', payload.userInfo.updateMyWallet)
+      context.commit('setMyWallet', payload.userInfo.updateMyWallet);
     })
     .catch((error) => {
-         console.log(error)
+         console.log(error);
       })
     },
     contentWallet(context){
-      setTimeout(() => { context.commit('setContentWallet') }, 1000) 
+      setTimeout(() => { context.commit('setContentWallet') }, 1000);
     },
     contentSubmit(context){
-      setTimeout(() => { context.commit('setContentSubmit') }, 1000) 
+      setTimeout(() => { context.commit('setContentSubmit') }, 1000);
     },
     getLocalStorage(context){
       const jsonObj = localStorage.getItem('loginUser');
       const jsObj = JSON.parse(jsonObj);
       if(localStorage){
-        context.commit('setUserInfo', jsObj)
+        context.commit('setUserInfo', jsObj);
       }
     }
   },
